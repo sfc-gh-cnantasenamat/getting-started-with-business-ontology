@@ -6,7 +6,7 @@ Companion code for the Snowflake guide [Getting Started with Business Ontology](
 
 ## Attribution
 
-The SQL scripts are the V1 demo by Tianxia Jia, from [sfc-gh-tjia/business_ontology](https://github.com/sfc-gh-tjia/business_ontology) (`Demo/sql/01` to `05`, commit `7b4c82a`), copied without changes. For the fuller V2 benchmark that compares Business Ontology against enriched Semantic Views, see that repository's `Demo/sql/v2/`.
+The SQL scripts are the V1 demo by Tianxia Jia, from [sfc-gh-tjia/business_ontology](https://github.com/sfc-gh-tjia/business_ontology) (`Demo/sql/01` to `05`, commit `7b4c82a`). For the fuller V2 benchmark that compares Business Ontology against enriched Semantic Views, see that repository's `Demo/sql/v2/`.
 
 ## Contents
 
