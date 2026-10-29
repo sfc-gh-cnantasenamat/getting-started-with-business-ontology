@@ -13,10 +13,6 @@ The two agents share the model, budget (150 s / 40k tokens), response instructio
 
 > **Building your own ontology?** See the [Getting Started with Business Ontology guide](https://github.com/sfc-gh-cnantasenamat/sfguide-getting-started-with-business-ontology): what goes in a semantic view vs Business Ontology, ten build phases with copy-paste `$business-ontology` prompts, agent setup, and how to evaluate uplift.
 
-## Attribution
-
-This demo is by Tianxia Jia, published in the Apache-2.0 licensed Snowflake-Solutions context-engineering repository (`Business_Ontology/Getting_Started`, commit `523581e`). The step-by-step walkthrough lives in the companion [Getting Started with Business Ontology guide](https://github.com/sfc-gh-cnantasenamat/sfguide-getting-started-with-business-ontology).
-
 ## Final result
 
 Run `20261023_072322_9764`: 196 agent calls, 0 errors.
