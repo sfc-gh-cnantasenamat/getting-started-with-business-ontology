@@ -19,9 +19,9 @@
 -- =====================================================================
 USE DATABASE BUSINESS_ONTOLOGY;
 
-CREATE SCHEMA IF NOT EXISTS SAP
+CREATE SCHEMA IF NOT EXISTS BUSINESS_ONTOLOGY.SAP
   COMMENT = 'Business Ontology demo: domain SVs (bare/enriched), governed BON, fair 3-agent benchmark';
-USE SCHEMA SAP;
+USE SCHEMA BUSINESS_ONTOLOGY.SAP;
 
 -- Zero-copy clone of the SAP source tables from RAW.
 -- PREREQUISITE: run 01_setup.sql and 02_raw_data.sql first;
