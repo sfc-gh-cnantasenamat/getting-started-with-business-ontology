@@ -1,4 +1,4 @@
-# SAP Business Ontology Demo (V2)
+# Getting Started with Business Ontology
 
 A fair, repeatable test of what **Snowflake Business Ontology (BON)** adds on top of **well-built semantic views**. It uses a realistic SAP supply-chain dataset with three domains: Procurement, Finance & Controlling, and Sales & Distribution.
 
