@@ -14,7 +14,7 @@
 -- limitations under the License.
 
 -- =====================================================================
--- BON Demo V2 — 08: Live governance scenarios
+-- Business Ontology demo, 10: Live governance scenarios
 -- These show value that a single benchmark run cannot: change management.
 -- Each step that edits the ontology must wait for the BON search index refresh
 -- (up to 6 hours). Check with:
@@ -59,11 +59,11 @@ SELECT SYSTEM$DRAFT_GLOSSARY_TERM('{"name":"Supplier Concentration Index","domai
 -- 1. Inspect bindings for a canonical metric:
 SELECT SYSTEM$GET_GLOSSARY_TERM_ASSETS('Procurement.BOM Cost Rollup');
 -- 2. Rebuild PURCHASING_ENRICHED_SV with bom_material_cost renamed to unit_build_cost
---    (edit 04_enriched_svs.sql and re-run that CREATE).
+--    (edit 06_enriched_svs.sql and re-run that CREATE).
 -- 3. Detect drift: the bound sub-object no longer exists.
---    DESC SEMANTIC VIEW DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV;   -- BOM_MATERIAL_COST absent
+--    DESC SEMANTIC VIEW BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV;   -- BOM_MATERIAL_COST absent
 --    Mark the binding stale and rebind (one place), instead of hunting through every agent prompt:
 -- SELECT SYSTEM$UPDATE_GLOSSARY_ASSOCIATION('Procurement.BOM Cost Rollup',
---   '{"refType":"SEMANTIC_VIEW","fqn":"DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV","subObjectType":"METRIC","entityQualifier":"BOM","subObjectName":"BOM_MATERIAL_COST"}',
+--   '{"refType":"SEMANTIC_VIEW","fqn":"BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV","subObjectType":"METRIC","entityQualifier":"BOM","subObjectName":"BOM_MATERIAL_COST"}',
 --   '{"validity":"TARGET_MISSING"}');
--- 4. Restore by re-running the original 04_enriched_svs.sql.
+-- 4. Restore by re-running the original 06_enriched_svs.sql.

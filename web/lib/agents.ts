@@ -18,7 +18,7 @@
 import { executeQuery } from "./snowflake";
 import { AgentResponse } from "./types";
 
-const SCHEMA = `${process.env.SNOWFLAKE_DATABASE || "DB_ONTOLOGY_CONTROL_PLANE"}.${process.env.SNOWFLAKE_SCHEMA || "SAP_BON_V2"}`;
+const SCHEMA = `${process.env.SNOWFLAKE_DATABASE || "BUSINESS_ONTOLOGY"}.${process.env.SNOWFLAKE_SCHEMA || "SAP"}`;
 const BASELINE_AGENT = `${SCHEMA}.ENRICHED_AGENT`;
 const BON_AGENT = `${SCHEMA}.BON_AGENT`;
 

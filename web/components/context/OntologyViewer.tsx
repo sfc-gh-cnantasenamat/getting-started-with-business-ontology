@@ -19,7 +19,7 @@
 
 import { useEffect, useRef } from "react";
 
-// Typed relationships from SAP_BON_V2 (05_bon.sql). Edge labels are BON relationship types.
+// Typed relationships from SAP (07_ontology.sql). Edge labels are BON relationship types.
 const BON_GRAPH = `graph LR
     subgraph proc [Procurement]
         Supplier

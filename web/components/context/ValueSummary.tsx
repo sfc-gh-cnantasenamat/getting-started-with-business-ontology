@@ -20,7 +20,7 @@
 
 // Top-of-page story for the Context tab: what well-built SVs already do, and the gaps only BON closes.
 // "Without BON" values are what the named SV metric returns; "With BON" values are the governed answers
-// (both verified against SAP_BON_V2.BENCHMARK_GROUND_TRUTH).
+// (both verified against SAP.BENCHMARK_GROUND_TRUTH).
 
 const GAPS = [
   {

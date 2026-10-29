@@ -14,15 +14,15 @@
 -- limitations under the License.
 
 -- =====================================================
--- SAP_PRODUCTION: Enterprise SAP-coded tables
+-- RAW: Enterprise SAP-coded tables
 -- Self-contained script: CREATE + INSERT for all tables
 -- Realistic SAP column names (LIFNR, MAKTX, MATKL etc.)
 -- This simulates what a real SAP extraction looks like.
 -- =====================================================
 
-USE DATABASE DB_ONTOLOGY_CONTROL_PLANE;
-USE SCHEMA SAP_PRODUCTION;
-USE WAREHOUSE ONTOLOGY_WH;
+USE DATABASE BUSINESS_ONTOLOGY;
+USE SCHEMA RAW;
+USE WAREHOUSE BUSINESS_ONTOLOGY_WH;
 
 -- =============================================================================
 -- MASTER DATA

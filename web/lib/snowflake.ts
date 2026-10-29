@@ -25,9 +25,9 @@ async function createConnection(): Promise<snowflake.Connection> {
     username: process.env.SNOWFLAKE_USER!,
     authenticator: "EXTERNALBROWSER",
     role: process.env.SNOWFLAKE_ROLE || "ACCOUNTADMIN",
-    warehouse: process.env.SNOWFLAKE_WAREHOUSE || "COMPUTE_WH",
-    database: process.env.SNOWFLAKE_DATABASE || "DB_ONTOLOGY_CONTROL_PLANE",
-    schema: process.env.SNOWFLAKE_SCHEMA || "SAP_BON_V2",
+    warehouse: process.env.SNOWFLAKE_WAREHOUSE || "BUSINESS_ONTOLOGY_WH",
+    database: process.env.SNOWFLAKE_DATABASE || "BUSINESS_ONTOLOGY",
+    schema: process.env.SNOWFLAKE_SCHEMA || "SAP",
   });
 
   await conn.connectAsync((err) => {

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""BON Demo V2 benchmark harness.
+"""Business Ontology demo benchmark harness.
 
 Measures Business Ontology uplift as arm C (enriched SVs + BON) minus arm B
 (enriched SVs alone). Same model, budget,
@@ -45,8 +45,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import snowflake.connector
 
-DATABASE = os.environ.get("SNOWFLAKE_DATABASE", "DB_ONTOLOGY_CONTROL_PLANE")
-SCHEMA_NAME = os.environ.get("SNOWFLAKE_SCHEMA", "SAP_BON_V2")
+DATABASE = os.environ.get("SNOWFLAKE_DATABASE", "BUSINESS_ONTOLOGY")
+SCHEMA_NAME = os.environ.get("SNOWFLAKE_SCHEMA", "SAP")
 SCHEMA = f"{DATABASE}.{SCHEMA_NAME}"
 ARMS = {"B": "ENRICHED_AGENT", "C": "BON_AGENT"}
 PAIRS = {  # V4: same question asked through two teams' agents
@@ -55,7 +55,7 @@ PAIRS = {  # V4: same question asked through two teams' agents
 }
 PAIR_QIDS = ["Q06", "Q07", "Q09"]
 JUDGE_MODEL = "claude-sonnet-4-5"
-# Index check: new V2 node that must be searchable, and retired V1 nodes that must not be.
+# Index check: a new node that must be searchable, and nodes from the retired SAP * domains that must not be.
 INDEX_PROBES = [("supplier count active suppliers", "Procurement.Supplier Count"),
                 ("revenue net of discounts", "Sales & Distribution.Revenue"),
                 ("tier a suppliers", "Procurement.Tier A Supplier")]
@@ -67,7 +67,7 @@ def connect():
 
 
 def check_index():
-    """Return (ready, report). Ready when new nodes are found and retired V1 nodes are gone."""
+    """Return (ready, report). Ready when new nodes are found and retired SAP * domain nodes are gone."""
     ready, lines = True, []
     for query, expected in INDEX_PROBES:
         out = subprocess.run(["cortex", "search", "object", query, "--types=business-ontology"],
@@ -76,7 +76,7 @@ def check_index():
         found = expected in [h.strip() for h in hits]
         stale = [h.strip() for h in hits if h.strip().startswith(RETIRED_DOMAINS)]
         ready &= found and not stale
-        lines.append(f"  '{query}': expected={'found' if found else 'MISSING'}, retired V1 hits={stale or 'none'}")
+        lines.append(f"  '{query}': expected={'found' if found else 'MISSING'}, retired-domain hits={stale or 'none'}")
     return ready, "\n".join(lines)
 
 
@@ -284,7 +284,7 @@ def main():
     if a.check_index:
         return
     if not ready and not a.force:
-        print("Index not ready (new V2 nodes missing or retired V1 nodes still served). "
+        print("Index not ready (new nodes missing or retired-domain nodes still served). "
               "Re-run later or pass --force. Propagation can take up to 6 hours.")
         return
 

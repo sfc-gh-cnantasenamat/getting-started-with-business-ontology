@@ -17,7 +17,7 @@
 
 import { EvalQuestion } from "./types";
 
-// V2 benchmark questions (mirror SAP_BON_V2.BENCHMARK_QUESTIONS / BENCHMARK_GROUND_TRUTH).
+// Benchmark questions (mirror SAP.BENCHMARK_QUESTIONS / BENCHMARK_GROUND_TRUTH).
 export const EVAL_QUESTIONS: EvalQuestion[] = [
   { id: "Q01", tier: "1", q: "What is our cost of goods sold for raw materials?",
     expected: "$1,290,020: invoices minus credit memos on GL 0040100000.",

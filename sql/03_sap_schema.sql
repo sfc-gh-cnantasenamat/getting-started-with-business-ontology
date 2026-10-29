@@ -14,27 +14,27 @@
 -- limitations under the License.
 
 -- =====================================================================
--- BON Demo V2 — 01: Schema, cloned data, reference (code) tables
--- Isolated from SAP_PRODUCTION (which also hosts the Cortex Sense demo).
+-- Business Ontology demo, 03: SAP schema, cloned data, reference (code) tables
+-- Built objects live in SAP; the source tables stay untouched in RAW.
 -- =====================================================================
-USE DATABASE DB_ONTOLOGY_CONTROL_PLANE;
+USE DATABASE BUSINESS_ONTOLOGY;
 
-CREATE SCHEMA IF NOT EXISTS SAP_BON_V2
-  COMMENT = 'BON demo v2: domain SVs (bare/enriched), governed BON, fair 3-agent benchmark';
-USE SCHEMA SAP_BON_V2;
+CREATE SCHEMA IF NOT EXISTS SAP
+  COMMENT = 'Business Ontology demo: domain SVs (bare/enriched), governed BON, fair 3-agent benchmark';
+USE SCHEMA SAP;
 
--- Zero-copy clone of the SAP source tables (identical data to V1).
--- PREREQUISITE: run ../01_setup_database.sql and ../02_create_sap_tables.sql first;
--- they create SAP_PRODUCTION and load the synthetic SAP data this script clones.
+-- Zero-copy clone of the SAP source tables from RAW.
+-- PREREQUISITE: run 01_setup.sql and 02_raw_data.sql first;
+-- they create RAW and load the synthetic SAP data this script clones.
 EXECUTE IMMEDIATE $$
 DECLARE
-  missing_source EXCEPTION (-20001, 'SAP_PRODUCTION.LFA1 not found. Run sql/01_setup_database.sql and sql/02_create_sap_tables.sql first.');
+  missing_source EXCEPTION (-20001, 'RAW.LFA1 not found. Run sql/01_setup.sql and sql/02_raw_data.sql first.');
 BEGIN
-  IF (NOT EXISTS (SELECT 1 FROM DB_ONTOLOGY_CONTROL_PLANE.INFORMATION_SCHEMA.TABLES
-                  WHERE TABLE_SCHEMA = 'SAP_PRODUCTION' AND TABLE_NAME = 'LFA1')) THEN
+  IF (NOT EXISTS (SELECT 1 FROM BUSINESS_ONTOLOGY.INFORMATION_SCHEMA.TABLES
+                  WHERE TABLE_SCHEMA = 'RAW' AND TABLE_NAME = 'LFA1')) THEN
     RAISE missing_source;
   END IF;
-  RETURN 'SAP_PRODUCTION source tables found';
+  RETURN 'RAW source tables found';
 END;
 $$;
 
@@ -47,8 +47,8 @@ DECLARE
 BEGIN
   FOR i IN 0 TO ARRAY_SIZE(t)-1 DO
     n := t[i];
-    EXECUTE IMMEDIATE 'CREATE OR REPLACE TABLE DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.' || n ||
-                      ' CLONE DB_ONTOLOGY_CONTROL_PLANE.SAP_PRODUCTION.' || n;
+    EXECUTE IMMEDIATE 'CREATE OR REPLACE TABLE BUSINESS_ONTOLOGY.SAP.' || n ||
+                      ' CLONE BUSINESS_ONTOLOGY.RAW.' || n;
   END FOR;
   RETURN 'cloned ' || ARRAY_SIZE(t);
 END;

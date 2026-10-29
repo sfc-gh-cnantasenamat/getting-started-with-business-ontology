@@ -14,7 +14,7 @@
 -- limitations under the License.
 
 -- =====================================================================
--- BON Demo V2 — 04: ENRICHED domain semantic views
+-- Business Ontology demo, 06: ENRICHED domain semantic views
 -- ENRICHED = what a strong customer builds for each team: metrics, code
 -- values in comments, synonyms, custom instructions, verified queries.
 --
@@ -26,21 +26,21 @@
 -- Enriched SVs document each team's rules but NOT the cross-team canonical
 -- decision. That decision is what Business Ontology governs.
 -- =====================================================================
-USE SCHEMA DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2;
+USE SCHEMA BUSINESS_ONTOLOGY.SAP;
 
 CREATE OR REPLACE SEMANTIC VIEW PURCHASING_ENRICHED_SV
 TABLES (
-  vendors AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LFA1 PRIMARY KEY (LIFNR) WITH SYNONYMS ('suppliers','vendor master') COMMENT = 'Vendor master (LFA1). One row per vendor record, including probationary vendors.',
-  account_groups AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account group code table (T077K).',
-  contracts AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LFB1 PRIMARY KEY (LIFNR, VKONT) COMMENT = 'Vendor contracts (LFB1).',
-  materials AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.MARA PRIMARY KEY (MATNR) WITH SYNONYMS ('products','parts') COMMENT = 'Material master (MARA): raw materials and assemblies.',
-  material_groups AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.T023T PRIMARY KEY (MATKL) COMMENT = 'Material group code table (T023T).',
-  purchase_orders AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.EKPO PRIMARY KEY (EBELN, EBELP) WITH SYNONYMS ('PO lines','procurement') COMMENT = 'Purchase order line items (EKPO).',
-  plants AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.T001W PRIMARY KEY (WERKS) COMMENT = 'Plants (T001W).',
-  shipments AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LIKP PRIMARY KEY (TKNUM) WITH SYNONYMS ('deliveries') COMMENT = 'Inbound shipments (LIKP).',
-  carriers AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LFA2 PRIMARY KEY (TDLNR) WITH SYNONYMS ('forwarding agents','logistics providers') COMMENT = 'Carriers / forwarding agents (LFA2).',
-  inspections AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.QALS PRIMARY KEY (PRUEFLOS) COMMENT = 'Quality inspection lots (QALS).',
-  bom AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.BOM_EXPLOSION PRIMARY KEY (ASSEMBLY, COMPONENT) WITH SYNONYMS ('bill of materials') COMMENT = 'Flattened multi-level bill of materials: every component of each assembly with extended quantity per one assembly unit.'
+  vendors AS BUSINESS_ONTOLOGY.SAP.LFA1 PRIMARY KEY (LIFNR) WITH SYNONYMS ('suppliers','vendor master') COMMENT = 'Vendor master (LFA1). One row per vendor record, including probationary vendors.',
+  account_groups AS BUSINESS_ONTOLOGY.SAP.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account group code table (T077K).',
+  contracts AS BUSINESS_ONTOLOGY.SAP.LFB1 PRIMARY KEY (LIFNR, VKONT) COMMENT = 'Vendor contracts (LFB1).',
+  materials AS BUSINESS_ONTOLOGY.SAP.MARA PRIMARY KEY (MATNR) WITH SYNONYMS ('products','parts') COMMENT = 'Material master (MARA): raw materials and assemblies.',
+  material_groups AS BUSINESS_ONTOLOGY.SAP.T023T PRIMARY KEY (MATKL) COMMENT = 'Material group code table (T023T).',
+  purchase_orders AS BUSINESS_ONTOLOGY.SAP.EKPO PRIMARY KEY (EBELN, EBELP) WITH SYNONYMS ('PO lines','procurement') COMMENT = 'Purchase order line items (EKPO).',
+  plants AS BUSINESS_ONTOLOGY.SAP.T001W PRIMARY KEY (WERKS) COMMENT = 'Plants (T001W).',
+  shipments AS BUSINESS_ONTOLOGY.SAP.LIKP PRIMARY KEY (TKNUM) WITH SYNONYMS ('deliveries') COMMENT = 'Inbound shipments (LIKP).',
+  carriers AS BUSINESS_ONTOLOGY.SAP.LFA2 PRIMARY KEY (TDLNR) WITH SYNONYMS ('forwarding agents','logistics providers') COMMENT = 'Carriers / forwarding agents (LFA2).',
+  inspections AS BUSINESS_ONTOLOGY.SAP.QALS PRIMARY KEY (PRUEFLOS) COMMENT = 'Quality inspection lots (QALS).',
+  bom AS BUSINESS_ONTOLOGY.SAP.BOM_EXPLOSION_VIEW PRIMARY KEY (ASSEMBLY, COMPONENT) WITH SYNONYMS ('bill of materials') COMMENT = 'Flattened multi-level bill of materials: every component of each assembly with extended quantity per one assembly unit.'
 )
 RELATIONSHIPS (
   vendors_to_groups AS vendors (KTOKK) REFERENCES account_groups,
@@ -111,17 +111,17 @@ METRICS (
 COMMENT = 'Procurement domain (owned by the Purchasing team): vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.'
 AI_SQL_GENERATION 'Material codes: MATKL 043 = Electronics, 047 = Raw Materials, 048 = Assembly. Join material_groups for group names. Assemblies (ASSY-*) are built from components listed in bom; bom already includes all levels, so never recurse. Shipment status D = delivered.'
 AI_VERIFIED_QUERIES (
-  spend_by_group AS (QUESTION 'Procurement spend by material group' SQL 'SELECT * FROM SEMANTIC_VIEW(DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV METRICS purchase_orders.procurement_spend DIMENSIONS material_groups.material_group_name)'),
-  bom_cost_by_assembly AS (QUESTION 'Material cost to build each assembly' SQL 'SELECT * FROM SEMANTIC_VIEW(DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV METRICS bom.bom_material_cost DIMENSIONS bom.assembly_id)')
+  spend_by_group AS (QUESTION 'Procurement spend by material group' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV METRICS purchase_orders.procurement_spend DIMENSIONS material_groups.material_group_name)'),
+  bom_cost_by_assembly AS (QUESTION 'Material cost to build each assembly' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV METRICS bom.bom_material_cost DIMENSIONS bom.assembly_id)')
 );
 
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE SEMANTIC VIEW FINANCE_ENRICHED_SV
 TABLES (
-  ap_lines AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.BSEG PRIMARY KEY (BELNR, BUZEI) WITH SYNONYMS ('accounts payable','AP postings','invoices') COMMENT = 'Accounting document line items (BSEG) for vendor invoices and credit memos.',
-  cost_postings AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.COEP WITH SYNONYMS ('cost allocations','controlling postings') COMMENT = 'Controlling cost postings by cost object (COEP).',
-  vendors AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LFA1 PRIMARY KEY (LIFNR) WITH SYNONYMS ('suppliers') COMMENT = 'Vendor master (LFA1) as used by Finance.',
-  account_groups AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account group code table (T077K).'
+  ap_lines AS BUSINESS_ONTOLOGY.SAP.BSEG PRIMARY KEY (BELNR, BUZEI) WITH SYNONYMS ('accounts payable','AP postings','invoices') COMMENT = 'Accounting document line items (BSEG) for vendor invoices and credit memos.',
+  cost_postings AS BUSINESS_ONTOLOGY.SAP.COEP WITH SYNONYMS ('cost allocations','controlling postings') COMMENT = 'Controlling cost postings by cost object (COEP).',
+  vendors AS BUSINESS_ONTOLOGY.SAP.LFA1 PRIMARY KEY (LIFNR) WITH SYNONYMS ('suppliers') COMMENT = 'Vendor master (LFA1) as used by Finance.',
+  account_groups AS BUSINESS_ONTOLOGY.SAP.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account group code table (T077K).'
 )
 RELATIONSHIPS (
   ap_to_vendors AS ap_lines (LIFNR) REFERENCES vendors,
@@ -158,17 +158,17 @@ METRICS (
 COMMENT = 'Finance & Controlling domain (owned by the Finance team): AP postings, COGS, cost allocations.'
 AI_SQL_GENERATION 'Always apply the posting-key sign: BSCHL 31 adds, BSCHL 34 subtracts. Use signed_amount, never raw amount, for any cost or COGS total. Cost object codes are in cost_object.'
 AI_VERIFIED_QUERIES (
-  cogs_raw AS (QUESTION 'What is COGS for raw materials?' SQL 'SELECT * FROM SEMANTIC_VIEW(DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_ENRICHED_SV METRICS ap_lines.cogs_raw_materials)'),
-  cost_by_object AS (QUESTION 'Total cost by cost object' SQL 'SELECT * FROM SEMANTIC_VIEW(DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_ENRICHED_SV METRICS cost_postings.total_posted_cost DIMENSIONS cost_postings.cost_object)')
+  cogs_raw AS (QUESTION 'What is COGS for raw materials?' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV METRICS ap_lines.cogs_raw_materials)'),
+  cost_by_object AS (QUESTION 'Total cost by cost object' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV METRICS cost_postings.total_posted_cost DIMENSIONS cost_postings.cost_object)')
 );
 
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE SEMANTIC VIEW SALES_ENRICHED_SV
 TABLES (
-  sales_items AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.VBAP PRIMARY KEY (VBELN, POSNR) WITH SYNONYMS ('sales orders','orders','bookings') COMMENT = 'Sales order line items (VBAP). NETWR is the order value before customer discounts.',
-  pricing AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.KONV PRIMARY KEY (KNUMV, KPOSN, KSCHL) WITH SYNONYMS ('pricing conditions','conditions') COMMENT = 'Pricing condition records (KONV): list price, discounts, surcharges.',
-  products AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.MARA PRIMARY KEY (MATNR) WITH SYNONYMS ('materials','assemblies') COMMENT = 'Material master (MARA): the assemblies we sell.',
-  customers AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.KNA1 PRIMARY KEY (KUNNR) WITH SYNONYMS ('accounts','clients') COMMENT = 'Customers.'
+  sales_items AS BUSINESS_ONTOLOGY.SAP.VBAP PRIMARY KEY (VBELN, POSNR) WITH SYNONYMS ('sales orders','orders','bookings') COMMENT = 'Sales order line items (VBAP). NETWR is the order value before customer discounts.',
+  pricing AS BUSINESS_ONTOLOGY.SAP.KONV PRIMARY KEY (KNUMV, KPOSN, KSCHL) WITH SYNONYMS ('pricing conditions','conditions') COMMENT = 'Pricing condition records (KONV): list price, discounts, surcharges.',
+  products AS BUSINESS_ONTOLOGY.SAP.MARA PRIMARY KEY (MATNR) WITH SYNONYMS ('materials','assemblies') COMMENT = 'Material master (MARA): the assemblies we sell.',
+  customers AS BUSINESS_ONTOLOGY.SAP.CUSTOMERS_VIEW PRIMARY KEY (KUNNR) WITH SYNONYMS ('accounts','clients') COMMENT = 'Customers.'
 )
 RELATIONSHIPS (
   sales_to_products AS sales_items (MATNR) REFERENCES products,
@@ -204,8 +204,8 @@ METRICS (
 COMMENT = 'Sales & Distribution domain (owned by the Sales team): orders, pricing conditions, customers.'
 AI_SQL_GENERATION 'Discounts are condition type K007; freight surcharges KF00 are not discounts. List price is the PR00 condition rate.'
 AI_VERIFIED_QUERIES (
-  bookings_by_product AS (QUESTION 'Gross bookings by product' SQL 'SELECT * FROM SEMANTIC_VIEW(DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_ENRICHED_SV METRICS sales_items.gross_bookings DIMENSIONS products.product_id)'),
-  discounts_total AS (QUESTION 'How much do we give away in customer discounts?' SQL 'SELECT * FROM SEMANTIC_VIEW(DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_ENRICHED_SV METRICS pricing.customer_discounts)')
+  bookings_by_product AS (QUESTION 'Gross bookings by product' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_SV METRICS sales_items.gross_bookings DIMENSIONS products.product_id)'),
+  discounts_total AS (QUESTION 'How much do we give away in customer discounts?' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_SV METRICS pricing.customer_discounts)')
 );
 
 -- Verification (all match BENCHMARK_GROUND_TRUTH):

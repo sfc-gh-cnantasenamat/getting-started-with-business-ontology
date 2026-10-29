@@ -73,7 +73,7 @@ How to read it:
 | 3 Cross-domain reasoning | Q10 to Q14 | Margin, customer profit, break-even, revenue per supplier, safe spend cuts |
 | 4 Governed meaning | Q15 to Q18, Q20 | Definitions, policies, where each is implemented, and refusing to define what isn't governed |
 
-Ground truth, including the defensible-but-wrong trap answer for each question, is in `sql/v2/02_benchmark_ground_truth.sql`.
+Ground truth, including the defensible-but-wrong trap answer for each question, is in `sql/04_ground_truth.sql`.
 
 ## What's in the ontology
 
@@ -104,34 +104,31 @@ Ground truth, including the defensible-but-wrong trap answer for each question, 
 
 ### 1. Snowflake objects
 
-First load the synthetic SAP source data (creates `SAP_PRODUCTION` and the `ONTOLOGY_WH` warehouse):
+Run the scripts in `sql/` in order. Everything lives in the `BUSINESS_ONTOLOGY` database, uses the `BUSINESS_ONTOLOGY_WH` warehouse, and is split across two schemas: `RAW` holds the synthetic SAP source tables, and `SAP` holds everything built on top of them.
 
 ```
-sql/01_setup_database.sql      # database, SAP_PRODUCTION schema, warehouse
-sql/02_create_sap_tables.sql   # 15 SAP tables + synthetic data
+sql/01_setup.sql              # BUSINESS_ONTOLOGY database, RAW schema, BUSINESS_ONTOLOGY_WH warehouse
+sql/02_raw_data.sql           # 15 SAP tables + synthetic data in RAW
+sql/03_sap_schema.sql         # SAP schema: tables cloned from RAW, T077K and T023T code tables
+sql/04_ground_truth.sql       # BENCHMARK_QUESTIONS, BENCHMARK_GROUND_TRUTH (20 questions)
+sql/05_bare_svs.sql           # CUSTOMERS_VIEW, BOM_EXPLOSION_VIEW, bare SVs (benchmark arm A)
+sql/06_enriched_svs.sql       # PURCHASING / FINANCE / SALES _ENRICHED_SV
+sql/07_ontology.sql           # 3 domains, 40 nodes, 51 relationships (approve the drafts)
+sql/08_representations.sql    # 43 representations
+sql/09_agents.sql             # 7 agents: BARE_AGENT, ENRICHED_AGENT, BON_AGENT, Finance/Sales team pairs
+sql/10_live_scenarios.sql     # optional change-management scenarios
 ```
 
-Then run `sql/v2/` in order. `01_schema_data.sql` clones the tables above into `SAP_BON_V2` and stops with an error if they are missing.
+`03_sap_schema.sql` stops with an error if the `RAW` tables are missing.
 
-> **Using a different database?** Every script uses `DB_ONTOLOGY_CONTROL_PLANE`. To use your own name, replace it in all SQL files before running them, then set `SNOWFLAKE_DATABASE` (and `SNOWFLAKE_SCHEMA` if you rename `SAP_BON_V2`) for the benchmark and web app:
+In `07_ontology.sql`, approve the 39 drafts before running the `Relationships` section, then draft, approve and link *Tier A Supplier* in the last section. The approve calls are commented out because they need your term IDs; within one worksheet session you can use `SELECT SYSTEM$APPROVE_ALL_GLOSSARY_TERMS('[]', 'ACTIVE', '{"sessionId":"CURRENT_SESSION"}');` instead.
+
+> **Using a different database?** Every script uses `BUSINESS_ONTOLOGY`. To use your own name, replace it in all SQL files before running them, then set `SNOWFLAKE_DATABASE` (and `SNOWFLAKE_SCHEMA` if you rename `SAP`) for the benchmark and web app:
 >
 > ```bash
-> grep -rl DB_ONTOLOGY_CONTROL_PLANE sql | xargs sed -i.bak 's/DB_ONTOLOGY_CONTROL_PLANE/MY_DB/g'
+> grep -rl BUSINESS_ONTOLOGY sql | xargs sed -i.bak 's/BUSINESS_ONTOLOGY/MY_DB/g'
 > export SNOWFLAKE_DATABASE=MY_DB
 > ```
-
-```
-01_schema_data.sql             # SAP_BON_V2 schema, SAP tables and data
-02_benchmark_ground_truth.sql  # BENCHMARK_QUESTIONS, BENCHMARK_GROUND_TRUTH (20 questions)
-03_bare_svs.sql                # bare SVs (legacy arm; not used in the final comparison)
-04_enriched_svs.sql            # PURCHASING / FINANCE / SALES _ENRICHED_SV
-05_bon.sql                     # 3 domains, 40 nodes, 51 relationships (approve the drafts)
-06_representations.sql         # 43 representations
-07_agents.sql                  # 7 agents: BARE_AGENT, ENRICHED_AGENT, BON_AGENT, Finance/Sales team pairs
-08_live_scenarios.sql          # optional change-management scenarios
-```
-
-In `05_bon.sql`, approve the 39 drafts before running the `Relationships` section, then draft, approve and link *Tier A Supplier* in the last section. The approve calls are commented out because they need your term IDs; within one worksheet session you can use `SELECT SYSTEM$APPROVE_ALL_GLOSSARY_TERMS('[]', 'ACTIVE', '{"sessionId":"CURRENT_SESSION"}');` instead. The header comments in `05` (39 nodes, 49 edges) and `06` (44 representations) predate the final edits; the statements create 40, 51 and 43.
 
 The [guide](https://github.com/sfc-gh-cnantasenamat/sfguide-getting-started-with-business-ontology) walks through these scripts section by section, with a check after each step.
 
@@ -149,7 +146,7 @@ SNOWFLAKE_CONNECTION_NAME=<conn> python -u benchmark/run_benchmark.py --arms B,C
 SNOWFLAKE_CONNECTION_NAME=<conn> python -u benchmark/run_benchmark.py --resume <RUN_ID>
 ```
 
-The harness refuses to run until the index serves the V2 nodes, including Tier A, unless you pass `--force`. Calls retry on transient connection errors. Results go to `SAP_BON_V2.BENCHMARK_RESULTS` and `benchmark/scorecard_<run_id>.json`.
+The harness refuses to run until the index serves the new nodes, including Tier A, unless you pass `--force`. Calls retry on transient connection errors. Results go to `SAP.BENCHMARK_RESULTS` and `benchmark/scorecard_<run_id>.json`.
 
 ### 3. Web app
 
@@ -190,7 +187,7 @@ Next.js (:3000) ──▶ Flask API (:5001) ──▶ DATA_AGENT_RUN()
 
 ## Live scenarios (change management)
 
-`sql/v2/08_live_scenarios.sql` covers what a one-off benchmark can't:
+`sql/10_live_scenarios.sql` covers what a one-off benchmark can't:
 
 - **S1 Change once:** a steward edits the Supplier Count definition. Every BON agent follows it, with no change to any semantic view or prompt.
 - **S2 Drafts are never served:** an unapproved definition stays invisible to agents until it is approved.
@@ -209,7 +206,3 @@ Next.js (:3000) ──▶ Flask API (:5001) ──▶ DATA_AGENT_RUN()
 - **The benchmark itself:**
   - It is small: 20 questions on one synthetic dataset.
   - Measure on your own contested questions before generalising.
-
-## Legacy V1
-
-`sql/01` to `05` are the original V1 build. V1 compared BON against a single *bare* semantic view and reported 27% vs 100%. That overstates the uplift, because a well-built semantic view would also supply much of the missing context. Use V2 for any claim about BON's value.

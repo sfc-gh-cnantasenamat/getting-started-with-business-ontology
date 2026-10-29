@@ -14,11 +14,11 @@
 -- limitations under the License.
 
 -- =====================================================================
--- BON Demo V2 — 02: Benchmark questions + SQL-verified ground truth
+-- Business Ontology demo, 04: Benchmark questions + SQL-verified ground truth
 -- Canonical Revenue = order value net of K007 customer discounts.
 -- Gross margin, revenue at risk, and customer profit all build on it.
 -- =====================================================================
-USE SCHEMA DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2;
+USE SCHEMA BUSINESS_ONTOLOGY.SAP;
 
 CREATE OR REPLACE TABLE BENCHMARK_QUESTIONS (
   QID VARCHAR, TIER NUMBER, TIER_NAME VARCHAR, VALUE_PILLAR VARCHAR, QUESTION VARCHAR

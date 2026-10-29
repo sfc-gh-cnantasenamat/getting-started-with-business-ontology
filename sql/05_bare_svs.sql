@@ -14,18 +14,18 @@
 -- limitations under the License.
 
 -- =====================================================================
--- BON Demo V2 — 03: Helper views + BARE domain semantic views
+-- Business Ontology demo, 05: Helper views + BARE domain semantic views
 -- BARE = what many teams start with: tables, keys, joins, label comments.
 -- No metrics, synonyms, code values, instructions, or verified queries.
 -- =====================================================================
-USE SCHEMA DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2;
+USE SCHEMA BUSINESS_ONTOLOGY.SAP;
 
 -- Customer dimension (derived from sales/pricing documents)
-CREATE OR REPLACE VIEW KNA1 COMMENT = 'Customer master (derived from sales and pricing documents)' AS
+CREATE OR REPLACE VIEW CUSTOMERS_VIEW COMMENT = 'Customer master (derived from sales and pricing documents)' AS
 SELECT DISTINCT KUNNR FROM (SELECT KUNNR FROM VBAP UNION SELECT KUNNR FROM KONV);
 
 -- Flattened multi-level BOM (used by the ENRICHED Purchasing view; BARE uses raw STPO)
-CREATE OR REPLACE VIEW BOM_EXPLOSION
+CREATE OR REPLACE VIEW BOM_EXPLOSION_VIEW
   COMMENT = 'Multi-level BOM flattened: every component reachable from each assembly with total extended quantity per assembly unit'
 AS
 WITH RECURSIVE x AS (
@@ -40,17 +40,17 @@ FROM x GROUP BY ASSEMBLY, COMPONENT;
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE SEMANTIC VIEW PURCHASING_BARE_SV
 TABLES (
-  LFA1 AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LFA1 PRIMARY KEY (LIFNR) COMMENT = 'Vendor master data',
-  T077K AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account groups',
-  LFB1 AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LFB1 PRIMARY KEY (LIFNR, VKONT) COMMENT = 'Vendor contract data',
-  MARA AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.MARA PRIMARY KEY (MATNR) COMMENT = 'Material master data',
-  T023T AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.T023T PRIMARY KEY (MATKL) COMMENT = 'Material group texts',
-  EKPO AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.EKPO PRIMARY KEY (EBELN, EBELP) COMMENT = 'Purchasing document items',
-  T001W AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.T001W PRIMARY KEY (WERKS) COMMENT = 'Plant data',
-  LIKP AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LIKP PRIMARY KEY (TKNUM) COMMENT = 'Shipment data',
-  LFA2 AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LFA2 PRIMARY KEY (TDLNR) COMMENT = 'Forwarding agent data',
-  QALS AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.QALS PRIMARY KEY (PRUEFLOS) COMMENT = 'Inspection lot data',
-  STPO AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.STPO PRIMARY KEY (STLNR, IDNRK) COMMENT = 'BOM items'
+  LFA1 AS BUSINESS_ONTOLOGY.SAP.LFA1 PRIMARY KEY (LIFNR) COMMENT = 'Vendor master data',
+  T077K AS BUSINESS_ONTOLOGY.SAP.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account groups',
+  LFB1 AS BUSINESS_ONTOLOGY.SAP.LFB1 PRIMARY KEY (LIFNR, VKONT) COMMENT = 'Vendor contract data',
+  MARA AS BUSINESS_ONTOLOGY.SAP.MARA PRIMARY KEY (MATNR) COMMENT = 'Material master data',
+  T023T AS BUSINESS_ONTOLOGY.SAP.T023T PRIMARY KEY (MATKL) COMMENT = 'Material group texts',
+  EKPO AS BUSINESS_ONTOLOGY.SAP.EKPO PRIMARY KEY (EBELN, EBELP) COMMENT = 'Purchasing document items',
+  T001W AS BUSINESS_ONTOLOGY.SAP.T001W PRIMARY KEY (WERKS) COMMENT = 'Plant data',
+  LIKP AS BUSINESS_ONTOLOGY.SAP.LIKP PRIMARY KEY (TKNUM) COMMENT = 'Shipment data',
+  LFA2 AS BUSINESS_ONTOLOGY.SAP.LFA2 PRIMARY KEY (TDLNR) COMMENT = 'Forwarding agent data',
+  QALS AS BUSINESS_ONTOLOGY.SAP.QALS PRIMARY KEY (PRUEFLOS) COMMENT = 'Inspection lot data',
+  STPO AS BUSINESS_ONTOLOGY.SAP.STPO PRIMARY KEY (STLNR, IDNRK) COMMENT = 'BOM items'
 )
 RELATIONSHIPS (
   LFA1 (KTOKK) REFERENCES T077K,
@@ -95,10 +95,10 @@ COMMENT = 'SAP procurement data: vendors, materials, purchase orders, shipments,
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE SEMANTIC VIEW FINANCE_BARE_SV
 TABLES (
-  BSEG AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.BSEG PRIMARY KEY (BELNR, BUZEI) COMMENT = 'Accounting document line items',
-  COEP AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.COEP COMMENT = 'Cost element line items',
-  LFA1 AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.LFA1 PRIMARY KEY (LIFNR) COMMENT = 'Vendor master data',
-  T077K AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account groups'
+  BSEG AS BUSINESS_ONTOLOGY.SAP.BSEG PRIMARY KEY (BELNR, BUZEI) COMMENT = 'Accounting document line items',
+  COEP AS BUSINESS_ONTOLOGY.SAP.COEP COMMENT = 'Cost element line items',
+  LFA1 AS BUSINESS_ONTOLOGY.SAP.LFA1 PRIMARY KEY (LIFNR) COMMENT = 'Vendor master data',
+  T077K AS BUSINESS_ONTOLOGY.SAP.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account groups'
 )
 RELATIONSHIPS (
   BSEG (LIFNR) REFERENCES LFA1,
@@ -119,10 +119,10 @@ COMMENT = 'SAP finance data: accounting line items, cost postings, vendors';
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE SEMANTIC VIEW SALES_BARE_SV
 TABLES (
-  VBAP AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.VBAP PRIMARY KEY (VBELN, POSNR) COMMENT = 'Sales document items',
-  KONV AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.KONV PRIMARY KEY (KNUMV, KPOSN, KSCHL) COMMENT = 'Pricing condition records',
-  MARA AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.MARA PRIMARY KEY (MATNR) COMMENT = 'Material master data',
-  KNA1 AS DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.KNA1 PRIMARY KEY (KUNNR) COMMENT = 'Customers'
+  VBAP AS BUSINESS_ONTOLOGY.SAP.VBAP PRIMARY KEY (VBELN, POSNR) COMMENT = 'Sales document items',
+  KONV AS BUSINESS_ONTOLOGY.SAP.KONV PRIMARY KEY (KNUMV, KPOSN, KSCHL) COMMENT = 'Pricing condition records',
+  MARA AS BUSINESS_ONTOLOGY.SAP.MARA PRIMARY KEY (MATNR) COMMENT = 'Material master data',
+  KNA1 AS BUSINESS_ONTOLOGY.SAP.CUSTOMERS_VIEW PRIMARY KEY (KUNNR) COMMENT = 'Customers'
 )
 RELATIONSHIPS (
   VBAP (MATNR) REFERENCES MARA,

@@ -14,7 +14,7 @@
 -- limitations under the License.
 
 -- =====================================================================
--- BON Demo V2 — 07: Agent matrix
+-- Business Ontology demo, 09: Agent matrix
 -- Every agent: same model (auto), same budget (150 s / 40k tokens), same
 -- response text, same domain tool descriptions. The ONLY difference between
 -- an arm and its "+ BON" twin is the business_ontology tool and its 2-step instruction.
@@ -34,8 +34,8 @@
 -- BON search index refresh can take up to 6 hours after ontology edits or grants.
 -- =====================================================================
 
-CREATE OR REPLACE AGENT DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.BARE_AGENT
-  COMMENT = 'V2 benchmark arm A: 3 BARE domain semantic views, no Business Ontology'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.BARE_AGENT
+  COMMENT = 'benchmark arm A: 3 BARE domain semantic views, no Business Ontology'
   PROFILE = '{"display_name": "SAP Assistant (bare SVs)"}'
   FROM SPECIFICATION $$
 models:
@@ -71,18 +71,18 @@ tools:
       description: Sales domain data - sales orders, pricing conditions, discounts, customers.
 tool_resources:
   query_purchasing:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_BARE_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_BARE_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_finance:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_BARE_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_BARE_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_sales:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_BARE_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.SALES_BARE_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
-CREATE OR REPLACE AGENT DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.ENRICHED_AGENT
-  COMMENT = 'V2 benchmark arm B: 3 ENRICHED domain semantic views, no Business Ontology'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.ENRICHED_AGENT
+  COMMENT = 'benchmark arm B: 3 ENRICHED domain semantic views, no Business Ontology'
   PROFILE = '{"display_name": "SAP Assistant (enriched SVs)"}'
   FROM SPECIFICATION $$
 models:
@@ -118,18 +118,18 @@ tools:
       description: Sales domain data - sales orders, pricing conditions, discounts, customers.
 tool_resources:
   query_purchasing:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_finance:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_sales:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
-CREATE OR REPLACE AGENT DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.BON_AGENT
-  COMMENT = 'V2 benchmark arm C: 3 ENRICHED domain semantic views + native Business Ontology search'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.BON_AGENT
+  COMMENT = 'benchmark arm C: 3 ENRICHED domain semantic views + native Business Ontology search'
   PROFILE = '{"display_name": "SAP Assistant (enriched SVs + Business Ontology)"}'
   FROM SPECIFICATION $$
 models:
@@ -183,19 +183,19 @@ tool_resources:
   business_ontology:
     corpus: businessOntology
   query_purchasing:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_finance:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_sales:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
 -- ------------------------------------------------ Consistency pairs
-CREATE OR REPLACE AGENT DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_AGENT
-  COMMENT = 'V2 consistency pair: Finance team agent (Finance + Purchasing enriched SVs), no BON'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.FINANCE_AGENT
+  COMMENT = 'consistency pair: Finance team agent (Finance + Purchasing enriched SVs), no BON'
   PROFILE = '{"display_name": "Finance Assistant"}'
   FROM SPECIFICATION $$
 models:
@@ -227,15 +227,15 @@ tools:
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
 tool_resources:
   query_finance:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_purchasing:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
-CREATE OR REPLACE AGENT DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_BON_AGENT
-  COMMENT = 'V2 consistency pair: Finance team agent (Finance + Purchasing enriched SVs) + BON'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.FINANCE_BON_AGENT
+  COMMENT = 'consistency pair: Finance team agent (Finance + Purchasing enriched SVs) + BON'
   PROFILE = '{"display_name": "Finance Assistant + BON"}'
   FROM SPECIFICATION $$
 models:
@@ -286,15 +286,15 @@ tool_resources:
   business_ontology:
     corpus: businessOntology
   query_finance:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.FINANCE_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_purchasing:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
-CREATE OR REPLACE AGENT DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_AGENT
-  COMMENT = 'V2 consistency pair: Sales team agent (Sales + Purchasing enriched SVs), no BON'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.SALES_AGENT
+  COMMENT = 'consistency pair: Sales team agent (Sales + Purchasing enriched SVs), no BON'
   PROFILE = '{"display_name": "Sales Assistant"}'
   FROM SPECIFICATION $$
 models:
@@ -326,15 +326,15 @@ tools:
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
 tool_resources:
   query_sales:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_purchasing:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
-CREATE OR REPLACE AGENT DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_BON_AGENT
-  COMMENT = 'V2 consistency pair: Sales team agent (Sales + Purchasing enriched SVs) + BON'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.SALES_BON_AGENT
+  COMMENT = 'consistency pair: Sales team agent (Sales + Purchasing enriched SVs) + BON'
   PROFILE = '{"display_name": "Sales Assistant + BON"}'
   FROM SPECIFICATION $$
 models:
@@ -385,9 +385,9 @@ tool_resources:
   business_ontology:
     corpus: businessOntology
   query_sales:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.SALES_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_purchasing:
-    semantic_view: DB_ONTOLOGY_CONTROL_PLANE.SAP_BON_V2.PURCHASING_ENRICHED_SV
-    execution_environment: {type: warehouse, warehouse: ONTOLOGY_WH, query_timeout: 120}
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+    execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;

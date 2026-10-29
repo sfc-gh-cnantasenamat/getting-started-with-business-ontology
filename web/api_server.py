@@ -33,8 +33,8 @@ from concurrent.futures import ThreadPoolExecutor
 app = Flask(__name__)
 CORS(app)
 
-DATABASE = os.environ.get("SNOWFLAKE_DATABASE", "DB_ONTOLOGY_CONTROL_PLANE")
-SCHEMA_NAME = os.environ.get("SNOWFLAKE_SCHEMA", "SAP_BON_V2")
+DATABASE = os.environ.get("SNOWFLAKE_DATABASE", "BUSINESS_ONTOLOGY")
+SCHEMA_NAME = os.environ.get("SNOWFLAKE_SCHEMA", "SAP")
 SCHEMA = f"{DATABASE}.{SCHEMA_NAME}"
 # Left panel: the same enriched SVs without BON, so the only difference between panels is the BON tool.
 BASELINE_AGENT = f"{SCHEMA}.ENRICHED_AGENT"
@@ -142,7 +142,7 @@ def agent_endpoint():
 
 @app.route("/api/results", methods=["GET"])
 def results_endpoint():
-    """Latest V2 benchmark run: per-question, per-arm accuracy plus summary metrics."""
+    """Latest benchmark run: per-question, per-arm accuracy plus summary metrics."""
     conn = get_connection()
     cur = conn.cursor(snowflake.connector.DictCursor)
     try:

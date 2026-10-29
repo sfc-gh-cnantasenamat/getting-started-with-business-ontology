@@ -76,7 +76,7 @@ export default function SourceTables() {
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">SAP Data (schema SAP_BON_V2)</h3>
+        <h3 className="text-lg font-semibold">SAP Data (schema SAP)</h3>
         <div className="flex gap-4 text-sm text-[var(--text-muted)]">
           <span><strong className="text-[var(--text)]">{totalTables}</strong> tables</span>
           <span><strong className="text-[var(--text)]">{totalRows}</strong> rows</span>
