@@ -517,7 +517,7 @@ INSERT INTO KONV VALUES ('KN-011', '010', 'PR00', 85.00, 12750.00, 'ASSY-002', '
 -- =====================================================
 -- Verify row counts
 -- =====================================================
-SELECT 'LFA1' AS TBL, COUNT(*) AS ROWS FROM LFA1
+SELECT 'LFA1' AS TBL, COUNT(*) AS ROW_COUNT FROM LFA1
 UNION ALL SELECT 'LFA2', COUNT(*) FROM LFA2
 UNION ALL SELECT 'MARA', COUNT(*) FROM MARA
 UNION ALL SELECT 'T001W', COUNT(*) FROM T001W

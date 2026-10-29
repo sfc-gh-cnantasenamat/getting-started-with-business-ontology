@@ -27,7 +27,7 @@ const GAPS = [
     gap: "1. Two teams, two correct metrics, one business word (and company jargon)",
     why: "Each team's semantic view is right for that team. Nothing in a semantic view says which one is the company's official answer.",
     examples: [
-      { q: "How many suppliers do we have?", without: "15 (Purchasing SV: vendor_record_count) or 14 (Finance SV)", with: "14: Supplier Count, probationary vendors excluded by policy" },
+      { q: "How many suppliers do we have?", without: "15 (Procurement SV: vendor_record_count) or 14 (Finance SV)", with: "14: Supplier Count, probationary vendors excluded by policy" },
       { q: "What is our revenue?", without: "$746,000: gross_bookings, which carries the synonym \"revenue\"", with: "$711,915: Revenue = net of customer discounts (net_revenue)" },
       { q: "What is our on-time delivery rate?", without: "90%: carrier self-reported rate", with: "66.7%: On-Time Delivery Rate, measured from actual delivery dates" },
       { q: "How much have we spent with our Tier A suppliers?", without: "No semantic view knows \"Tier A\": the agent has to ask or guess which vendor group is meant", with: "$251,690: Tier A = strategic partners (account group ZSTR)" },

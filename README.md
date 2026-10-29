@@ -53,7 +53,7 @@ How to read it:
 - **Sense proposes, Ontology governs, SVs execute.** BON defines what a metric *means* and which implementation is canonical. Semantic views compute it.
 - **BON does not replace a good semantic view.** Each team's view is correct on its own terms, and the teams deliberately disagree, as real teams do:
 
-| Question | Purchasing SV | Finance / Sales SV | Governed answer (BON) |
+| Question | Procurement SV | Finance / Sales SV | Governed answer (BON) |
 |---|---|---|---|
 | Supplier count | `vendor_record_count` = 15 | `active_supplier_count` = 14 | **Supplier Count = 14** (probationary vendors excluded by policy) |
 | Revenue | n/a | `gross_bookings` = 746,000 (synonym "revenue") | **Revenue = net_revenue = 711,915** |
@@ -112,7 +112,7 @@ sql/02_raw_data.sql           # 15 SAP tables + synthetic data in RAW
 sql/03_sap_schema.sql         # SAP schema: tables cloned from RAW, T077K and T023T code tables
 sql/04_ground_truth.sql       # BENCHMARK_QUESTIONS, BENCHMARK_GROUND_TRUTH (20 questions)
 sql/05_bare_svs.sql           # CUSTOMERS_VIEW, BOM_EXPLOSION_VIEW, bare SVs (benchmark arm A)
-sql/06_enriched_svs.sql       # PURCHASING / FINANCE / SALES _ENRICHED_SV
+sql/06_enriched_svs.sql       # PROCUREMENT / FINANCE / SALES _ENRICHED_SV
 sql/07_ontology.sql           # 3 domains, 40 nodes, 51 relationships (approve the drafts)
 sql/08_representations.sql    # 43 representations
 sql/09_agents.sql             # 7 agents: BARE_AGENT, ENRICHED_AGENT, BON_AGENT, Finance/Sales team pairs

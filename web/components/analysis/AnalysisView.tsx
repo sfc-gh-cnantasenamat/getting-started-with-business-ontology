@@ -150,7 +150,7 @@ export default function AnalysisView() {
             <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
               <h3 className="text-lg font-semibold mb-2">Do two teams get the same answer?</h3>
               <p className="text-sm text-[var(--text-muted)] mb-3">
-                Finance agent (Finance + Purchasing SVs) vs Sales agent (Sales + Purchasing SVs), same question, same run.
+                Finance agent (Finance + Procurement SVs) vs Sales agent (Sales + Procurement SVs), same question, same run.
               </p>
               <table className="w-full text-sm">
                 <thead><tr className="text-left text-xs text-[var(--text-muted)]">

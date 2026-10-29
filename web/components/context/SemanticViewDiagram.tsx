@@ -20,7 +20,7 @@
 
 const SVS = [
   {
-    name: "PURCHASING_ENRICHED_SV", team: "Procurement team",
+    name: "PROCUREMENT_ENRICHED_SV", team: "Procurement team",
     tables: "vendors, materials, purchase orders, shipments, carriers, inspections, bom (flattened)",
     metrics: ["vendor_record_count (\"supplier count\") = 15", "carrier_otd_rate (\"on-time delivery\") = 90%",
               "operational_otd_rate = 66.7%", "bom_material_cost (ASSY-004) = 286.60", "avg_standard_price (\"unit cost\")", "procurement_spend"],
@@ -38,7 +38,7 @@ const SVS = [
 ];
 
 const CONFLICTS = [
-  { q: "How many suppliers?", a: "Purchasing 15 vs Finance 14", governed: "Supplier Count = 14" },
+  { q: "How many suppliers?", a: "Procurement 15 vs Finance 14", governed: "Supplier Count = 14" },
   { q: "What is our revenue?", a: "gross_bookings 746,000 vs net_revenue 711,915", governed: "Revenue = 711,915" },
   { q: "On-time delivery rate?", a: "carrier_otd_rate 90% vs operational_otd_rate 66.7%", governed: "On-Time Delivery Rate = 66.7%" },
   { q: "Cost to make ASSY-004?", a: "avg_standard_price 520 vs bom_material_cost 286.60", governed: "BOM Cost Rollup = 286.60" },

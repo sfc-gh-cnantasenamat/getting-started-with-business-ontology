@@ -80,8 +80,8 @@ const BON_GRAPH = `graph LR
 const CANONICAL = [
   { term: "Supplier Count", impl: "FINANCE_ENRICHED_SV · vendors.active_supplier_count", variant: "Vendor Record Count (scope: Procurement operations)", value: "14" },
   { term: "Revenue", impl: "SALES_ENRICHED_SV · net_revenue (derived)", variant: "Gross Bookings (scope: Sales pipeline)", value: "711,915" },
-  { term: "On-Time Delivery Rate", impl: "PURCHASING_ENRICHED_SV · shipments.operational_otd_rate", variant: "Carrier Reported On-Time Rate (scope: Carrier scorecard)", value: "66.7%" },
-  { term: "BOM Cost Rollup", impl: "PURCHASING_ENRICHED_SV · bom.bom_material_cost", variant: "not the assembly standard price STPRS", value: "286.60 (ASSY-004)" },
+  { term: "On-Time Delivery Rate", impl: "PROCUREMENT_ENRICHED_SV · shipments.operational_otd_rate", variant: "Carrier Reported On-Time Rate (scope: Carrier scorecard)", value: "66.7%" },
+  { term: "BOM Cost Rollup", impl: "PROCUREMENT_ENRICHED_SV · bom.bom_material_cost", variant: "not the assembly standard price STPRS", value: "286.60 (ASSY-004)" },
 ];
 
 const CROSS = [

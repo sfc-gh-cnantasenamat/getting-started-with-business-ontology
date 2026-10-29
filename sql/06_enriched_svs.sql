@@ -19,16 +19,16 @@
 -- values in comments, synonyms, custom instructions, verified queries.
 --
 -- Deliberate, realistic conflicts across teams (each defensible locally):
---   Supplier count : Purchasing vendor_record_count = 15  vs  Finance active_supplier_count = 14
---   On-time rate   : Purchasing carrier_otd_rate = 90%    vs  operational_otd_rate = 66.7%
+--   Supplier count : Procurement vendor_record_count = 15  vs  Finance active_supplier_count = 14
+--   On-time rate   : Procurement carrier_otd_rate = 90%    vs  operational_otd_rate = 66.7%
 --   Revenue        : Sales gross_bookings = 746,000       vs  net_revenue = 711,915
---   Unit cost      : Purchasing avg_standard_price (STPRS) vs bom_material_cost
+--   Unit cost      : Procurement avg_standard_price (STPRS) vs bom_material_cost
 -- Enriched SVs document each team's rules but NOT the cross-team canonical
 -- decision. That decision is what Business Ontology governs.
 -- =====================================================================
 USE SCHEMA BUSINESS_ONTOLOGY.SAP;
 
-CREATE OR REPLACE SEMANTIC VIEW PURCHASING_ENRICHED_SV
+CREATE OR REPLACE SEMANTIC VIEW PROCUREMENT_ENRICHED_SV
 TABLES (
   vendors AS BUSINESS_ONTOLOGY.SAP.LFA1 PRIMARY KEY (LIFNR) WITH SYNONYMS ('suppliers','vendor master') COMMENT = 'Vendor master (LFA1). One row per vendor record, including probationary vendors.',
   account_groups AS BUSINESS_ONTOLOGY.SAP.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account group code table (T077K).',
@@ -111,8 +111,8 @@ METRICS (
 COMMENT = 'Procurement domain (owned by the Purchasing team): vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.'
 AI_SQL_GENERATION 'Material codes: MATKL 043 = Electronics, 047 = Raw Materials, 048 = Assembly. Join material_groups for group names. Assemblies (ASSY-*) are built from components listed in bom; bom already includes all levels, so never recurse. Shipment status D = delivered.'
 AI_VERIFIED_QUERIES (
-  spend_by_group AS (QUESTION 'Procurement spend by material group' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV METRICS purchase_orders.procurement_spend DIMENSIONS material_groups.material_group_name)'),
-  bom_cost_by_assembly AS (QUESTION 'Material cost to build each assembly' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV METRICS bom.bom_material_cost DIMENSIONS bom.assembly_id)')
+  spend_by_group AS (QUESTION 'Procurement spend by material group' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.PROCUREMENT_ENRICHED_SV METRICS purchase_orders.procurement_spend DIMENSIONS material_groups.material_group_name)'),
+  bom_cost_by_assembly AS (QUESTION 'Material cost to build each assembly' SQL 'SELECT * FROM SEMANTIC_VIEW(BUSINESS_ONTOLOGY.SAP.PROCUREMENT_ENRICHED_SV METRICS bom.bom_material_cost DIMENSIONS bom.assembly_id)')
 );
 
 -- ---------------------------------------------------------------------
@@ -209,7 +209,7 @@ AI_VERIFIED_QUERIES (
 );
 
 -- Verification (all match BENCHMARK_GROUND_TRUTH):
--- SELECT * FROM SEMANTIC_VIEW(PURCHASING_ENRICHED_SV METRICS bom.bom_material_cost DIMENSIONS bom.assembly_id);   -- ASSY-004 = 286.60
--- SELECT * FROM SEMANTIC_VIEW(PURCHASING_ENRICHED_SV METRICS shipments.operational_otd_rate, carriers.carrier_otd_rate); -- 66.7 / 90
+-- SELECT * FROM SEMANTIC_VIEW(PROCUREMENT_ENRICHED_SV METRICS bom.bom_material_cost DIMENSIONS bom.assembly_id);   -- ASSY-004 = 286.60
+-- SELECT * FROM SEMANTIC_VIEW(PROCUREMENT_ENRICHED_SV METRICS shipments.operational_otd_rate, carriers.carrier_otd_rate); -- 66.7 / 90
 -- SELECT * FROM SEMANTIC_VIEW(FINANCE_ENRICHED_SV METRICS ap_lines.cogs_raw_materials, ap_lines.cogs_freight, vendors.active_supplier_count); -- 1,290,020 / 39,800 / 14
 -- SELECT * FROM SEMANTIC_VIEW(SALES_ENRICHED_SV METRICS sales_items.gross_bookings, pricing.customer_discounts, net_revenue);  -- 746,000 / 34,085 / 711,915

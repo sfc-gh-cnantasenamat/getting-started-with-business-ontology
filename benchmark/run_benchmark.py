@@ -50,7 +50,7 @@ SCHEMA_NAME = os.environ.get("SNOWFLAKE_SCHEMA", "SAP")
 SCHEMA = f"{DATABASE}.{SCHEMA_NAME}"
 ARMS = {"B": "ENRICHED_AGENT", "C": "BON_AGENT"}
 PAIRS = {  # V4: same question asked through two teams' agents
-    "no_bon": ("FINANCE_AGENT", "SALES_AGENT"),
+    "no_bon": ("FINANCE_ENRICHED_AGENT", "SALES_ENRICHED_AGENT"),
     "bon": ("FINANCE_BON_AGENT", "SALES_BON_AGENT"),
 }
 PAIR_QIDS = ["Q06", "Q07", "Q09"]

@@ -24,7 +24,7 @@ USE SCHEMA BUSINESS_ONTOLOGY.SAP;
 CREATE OR REPLACE VIEW CUSTOMERS_VIEW COMMENT = 'Customer master (derived from sales and pricing documents)' AS
 SELECT DISTINCT KUNNR FROM (SELECT KUNNR FROM VBAP UNION SELECT KUNNR FROM KONV);
 
--- Flattened multi-level BOM (used by the ENRICHED Purchasing view; BARE uses raw STPO)
+-- Flattened multi-level BOM (used by the ENRICHED Procurement view; BARE uses raw STPO)
 CREATE OR REPLACE VIEW BOM_EXPLOSION_VIEW
   COMMENT = 'Multi-level BOM flattened: every component reachable from each assembly with total extended quantity per assembly unit'
 AS
@@ -38,7 +38,7 @@ SELECT ASSEMBLY, COMPONENT, SUM(QTY)::NUMBER(18,4) AS EXTENDED_QTY, MAX(LVL) AS 
 FROM x GROUP BY ASSEMBLY, COMPONENT;
 
 -- ---------------------------------------------------------------------
-CREATE OR REPLACE SEMANTIC VIEW PURCHASING_BARE_SV
+CREATE OR REPLACE SEMANTIC VIEW PROCUREMENT_BARE_SV
 TABLES (
   LFA1 AS BUSINESS_ONTOLOGY.SAP.LFA1 PRIMARY KEY (LIFNR) COMMENT = 'Vendor master data',
   T077K AS BUSINESS_ONTOLOGY.SAP.T077K PRIMARY KEY (KTOKK) COMMENT = 'Vendor account groups',

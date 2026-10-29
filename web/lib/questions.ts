@@ -34,7 +34,7 @@ export const EVAL_QUESTIONS: EvalQuestion[] = [
 
   { id: "Q06", tier: "2", q: "How many suppliers do we have?",
     expected: "14 active suppliers (ZSTR + ZSTD). Probationary ZPRB excluded by policy.",
-    trap: "15: Purchasing's vendor_record_count, which also answers to \"supplier count\".", governed: "Supplier Count" },
+    trap: "15: Procurement's vendor_record_count, which also answers to \"supplier count\".", governed: "Supplier Count" },
   { id: "Q07", tier: "2", q: "What is our revenue?",
     expected: "$711,915: net of K007 customer discounts (net_revenue).",
     trap: "$746,000: Sales' gross_bookings, which carries the synonym \"revenue\".", governed: "Revenue" },

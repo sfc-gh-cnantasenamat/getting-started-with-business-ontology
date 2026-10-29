@@ -23,8 +23,8 @@
 --   Arm B  ENRICHED_AGENT    3 ENRICHED SVs
 --   Arm C  BON_AGENT         3 ENRICHED SVs + Business Ontology      (BON uplift = C - B)
 --   Consistency pairs (V4: do two teams get the same answer?)
---          FINANCE_AGENT / FINANCE_BON_AGENT   Finance + Purchasing ENRICHED SVs
---          SALES_AGENT   / SALES_BON_AGENT     Sales + Purchasing ENRICHED SVs
+--          FINANCE_ENRICHED_AGENT / FINANCE_BON_AGENT   Finance + Procurement ENRICHED SVs
+--          SALES_ENRICHED_AGENT   / SALES_BON_AGENT     Sales + Procurement ENRICHED SVs
 --   Finance sees active_supplier_count (14); Sales only sees vendor_record_count (15).
 --   Without BON they disagree; with BON both should answer 14.
 --
@@ -53,13 +53,13 @@ instructions:
     Data lives in three domain tools. Each tool queries one domain only and
     cannot join to another domain, so for questions that span domains, query
     each relevant tool and combine the results yourself.
-    - query_purchasing: vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials
+    - query_procurement: vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials
     - query_finance: accounts payable postings, COGS, cost allocations by cost object
     - query_sales: sales orders, pricing conditions, discounts, customers
 tools:
   - tool_spec:
       type: cortex_analyst_text_to_sql
-      name: query_purchasing
+      name: query_procurement
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
   - tool_spec:
       type: cortex_analyst_text_to_sql
@@ -70,8 +70,8 @@ tools:
       name: query_sales
       description: Sales domain data - sales orders, pricing conditions, discounts, customers.
 tool_resources:
-  query_purchasing:
-    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_BARE_SV
+  query_procurement:
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PROCUREMENT_BARE_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_finance:
     semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_BARE_SV
@@ -100,13 +100,13 @@ instructions:
     Data lives in three domain tools. Each tool queries one domain only and
     cannot join to another domain, so for questions that span domains, query
     each relevant tool and combine the results yourself.
-    - query_purchasing: vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials
+    - query_procurement: vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials
     - query_finance: accounts payable postings, COGS, cost allocations by cost object
     - query_sales: sales orders, pricing conditions, discounts, customers
 tools:
   - tool_spec:
       type: cortex_analyst_text_to_sql
-      name: query_purchasing
+      name: query_procurement
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
   - tool_spec:
       type: cortex_analyst_text_to_sql
@@ -117,8 +117,8 @@ tools:
       name: query_sales
       description: Sales domain data - sales orders, pricing conditions, discounts, customers.
 tool_resources:
-  query_purchasing:
-    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+  query_procurement:
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PROCUREMENT_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_finance:
     semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV
@@ -151,7 +151,7 @@ instructions:
     Data lives in three domain tools. Each tool queries one domain only and
     cannot join to another domain, so for questions that span domains, query
     each relevant tool and combine the results yourself.
-    - query_purchasing: vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials
+    - query_procurement: vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials
     - query_finance: accounts payable postings, COGS, cost allocations by cost object
     - query_sales: sales orders, pricing conditions, discounts, customers
 
@@ -169,7 +169,7 @@ tools:
       description: Governed business definitions - canonical metrics and their implementing semantic view metrics, scoped variants, business policies, code meanings, and how concepts relate across Procurement, Finance and Sales.
   - tool_spec:
       type: cortex_analyst_text_to_sql
-      name: query_purchasing
+      name: query_procurement
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
   - tool_spec:
       type: cortex_analyst_text_to_sql
@@ -182,8 +182,8 @@ tools:
 tool_resources:
   business_ontology:
     corpus: businessOntology
-  query_purchasing:
-    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+  query_procurement:
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PROCUREMENT_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
   query_finance:
     semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV
@@ -194,8 +194,8 @@ tool_resources:
 $$;
 
 -- ------------------------------------------------ Consistency pairs
-CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.FINANCE_AGENT
-  COMMENT = 'consistency pair: Finance team agent (Finance + Purchasing enriched SVs), no BON'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_AGENT
+  COMMENT = 'consistency pair: Finance team agent (Finance + Procurement enriched SVs), no BON'
   PROFILE = '{"display_name": "Finance Assistant"}'
   FROM SPECIFICATION $$
 models:
@@ -215,7 +215,7 @@ instructions:
     questions that span domains, query each relevant tool and combine the
     results yourself.
     - query_finance: Finance domain data - accounts payable postings, cost of goods sold, cost allocations by cost object.
-    - query_purchasing: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
+    - query_procurement: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
 tools:
   - tool_spec:
       type: cortex_analyst_text_to_sql
@@ -223,19 +223,19 @@ tools:
       description: Finance domain data - accounts payable postings, cost of goods sold, cost allocations by cost object.
   - tool_spec:
       type: cortex_analyst_text_to_sql
-      name: query_purchasing
+      name: query_procurement
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
 tool_resources:
   query_finance:
     semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
-  query_purchasing:
-    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+  query_procurement:
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PROCUREMENT_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
 CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.FINANCE_BON_AGENT
-  COMMENT = 'consistency pair: Finance team agent (Finance + Purchasing enriched SVs) + BON'
+  COMMENT = 'consistency pair: Finance team agent (Finance + Procurement enriched SVs) + BON'
   PROFILE = '{"display_name": "Finance Assistant + BON"}'
   FROM SPECIFICATION $$
 models:
@@ -259,7 +259,7 @@ instructions:
     questions that span domains, query each relevant tool and combine the
     results yourself.
     - query_finance: Finance domain data - accounts payable postings, cost of goods sold, cost allocations by cost object.
-    - query_purchasing: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
+    - query_procurement: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
     Before querying data, call business_ontology to look up the governed
     definition of each business term in the question. Prefer terms from the
     Procurement, Finance & Controlling, and Sales & Distribution domains. When
@@ -280,7 +280,7 @@ tools:
       description: Finance domain data - accounts payable postings, cost of goods sold, cost allocations by cost object.
   - tool_spec:
       type: cortex_analyst_text_to_sql
-      name: query_purchasing
+      name: query_procurement
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
 tool_resources:
   business_ontology:
@@ -288,13 +288,13 @@ tool_resources:
   query_finance:
     semantic_view: BUSINESS_ONTOLOGY.SAP.FINANCE_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
-  query_purchasing:
-    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+  query_procurement:
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PROCUREMENT_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
-CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.SALES_AGENT
-  COMMENT = 'consistency pair: Sales team agent (Sales + Purchasing enriched SVs), no BON'
+CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_AGENT
+  COMMENT = 'consistency pair: Sales team agent (Sales + Procurement enriched SVs), no BON'
   PROFILE = '{"display_name": "Sales Assistant"}'
   FROM SPECIFICATION $$
 models:
@@ -314,7 +314,7 @@ instructions:
     questions that span domains, query each relevant tool and combine the
     results yourself.
     - query_sales: Sales domain data - sales orders, pricing conditions, discounts, customers.
-    - query_purchasing: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
+    - query_procurement: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
 tools:
   - tool_spec:
       type: cortex_analyst_text_to_sql
@@ -322,19 +322,19 @@ tools:
       description: Sales domain data - sales orders, pricing conditions, discounts, customers.
   - tool_spec:
       type: cortex_analyst_text_to_sql
-      name: query_purchasing
+      name: query_procurement
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
 tool_resources:
   query_sales:
     semantic_view: BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
-  query_purchasing:
-    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+  query_procurement:
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PROCUREMENT_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
 
 CREATE OR REPLACE AGENT BUSINESS_ONTOLOGY.SAP.SALES_BON_AGENT
-  COMMENT = 'consistency pair: Sales team agent (Sales + Purchasing enriched SVs) + BON'
+  COMMENT = 'consistency pair: Sales team agent (Sales + Procurement enriched SVs) + BON'
   PROFILE = '{"display_name": "Sales Assistant + BON"}'
   FROM SPECIFICATION $$
 models:
@@ -358,7 +358,7 @@ instructions:
     questions that span domains, query each relevant tool and combine the
     results yourself.
     - query_sales: Sales domain data - sales orders, pricing conditions, discounts, customers.
-    - query_purchasing: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
+    - query_procurement: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
     Before querying data, call business_ontology to look up the governed
     definition of each business term in the question. Prefer terms from the
     Procurement, Finance & Controlling, and Sales & Distribution domains. When
@@ -379,7 +379,7 @@ tools:
       description: Sales domain data - sales orders, pricing conditions, discounts, customers.
   - tool_spec:
       type: cortex_analyst_text_to_sql
-      name: query_purchasing
+      name: query_procurement
       description: Procurement domain data - vendors, materials, purchase orders, shipments, carriers, inspections, bill of materials.
 tool_resources:
   business_ontology:
@@ -387,7 +387,7 @@ tool_resources:
   query_sales:
     semantic_view: BUSINESS_ONTOLOGY.SAP.SALES_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
-  query_purchasing:
-    semantic_view: BUSINESS_ONTOLOGY.SAP.PURCHASING_ENRICHED_SV
+  query_procurement:
+    semantic_view: BUSINESS_ONTOLOGY.SAP.PROCUREMENT_ENRICHED_SV
     execution_environment: {type: warehouse, warehouse: BUSINESS_ONTOLOGY_WH, query_timeout: 120}
 $$;
