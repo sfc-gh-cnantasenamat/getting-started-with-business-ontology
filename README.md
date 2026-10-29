@@ -131,9 +131,13 @@ Then run `sql/v2/` in order. `01_schema_data.sql` clones the tables above into `
 04_enriched_svs.sql            # PURCHASING / FINANCE / SALES _ENRICHED_SV
 05_bon.sql                     # 3 domains, 40 nodes, 51 relationships (approve the drafts)
 06_representations.sql         # 43 representations
-07_agents.sql                  # ENRICHED_AGENT, BON_AGENT, plus Finance/Sales team agents
+07_agents.sql                  # 7 agents: BARE_AGENT, ENRICHED_AGENT, BON_AGENT, Finance/Sales team pairs
 08_live_scenarios.sql          # optional change-management scenarios
 ```
+
+In `05_bon.sql`, approve the 39 drafts before running the `Relationships` section, then draft, approve and link *Tier A Supplier* in the last section. The approve calls are commented out because they need your term IDs; within one worksheet session you can use `SELECT SYSTEM$APPROVE_ALL_GLOSSARY_TERMS('[]', 'ACTIVE', '{"sessionId":"CURRENT_SESSION"}');` instead. The header comments in `05` (39 nodes, 49 edges) and `06` (44 representations) predate the final edits; the statements create 40, 51 and 43.
+
+The [guide](https://github.com/sfc-gh-cnantasenamat/sfguide-getting-started-with-business-ontology) walks through these scripts section by section, with a check after each step.
 
 ### 2. Wait for the search index, then benchmark
 
