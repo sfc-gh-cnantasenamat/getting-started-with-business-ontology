@@ -20,14 +20,14 @@ Measures Business Ontology uplift as arm C (enriched SVs + BON) minus arm B
 instructions, and SVs across B and C: the only difference is the BON tool.
 
 Value scorecard (maps to Business Ontology positioning):
-  V1 canonical choice    Tier 2: pick the governed metric among conflicting SV metrics
-  V2 cross-domain        Tier 3: compose meaning across Sales/Finance/Procurement SVs
-  V3 governed meaning    Tier 4: explain the business definition, policy, implementation
-  V4 consistency         same question, two teams' agents, same answer?
-  V5 baseline fairness   Tier 1: enriched SVs already handle single-SV rules (BON adds ~0)
-  V6 accuracy stability  answers identical across repeated runs
-  V7 cost                latency and tool calls per answer
-  V8 traceability        answer names the governed term and its implementing SV metric
+  canonical choice       Tier 2: pick the governed metric among conflicting SV metrics
+  cross-domain           Tier 3: compose meaning across Sales/Finance/Procurement SVs
+  governed meaning       Tier 4: explain the business definition, policy, implementation
+  consistency            same question, two teams' agents, same answer?
+  baseline fairness      Tier 1: enriched SVs already handle single-SV rules (BON adds ~0)
+  accuracy stability     answers identical across repeated runs
+  cost                   latency and tool calls per answer
+  traceability           answer names the governed term and its implementing SV metric
 
 Usage:
   SNOWFLAKE_CONNECTION_NAME=<conn> python run_benchmark.py            # full run
@@ -49,7 +49,7 @@ DATABASE = os.environ.get("SNOWFLAKE_DATABASE", "BUSINESS_ONTOLOGY")
 SCHEMA_NAME = os.environ.get("SNOWFLAKE_SCHEMA", "SAP")
 SCHEMA = f"{DATABASE}.{SCHEMA_NAME}"
 ARMS = {"B": "ENRICHED_AGENT", "C": "BON_AGENT"}
-PAIRS = {  # V4: same question asked through two teams' agents
+PAIRS = {  # Same question asked through two teams' agents
     "no_bon": ("FINANCE_ENRICHED_AGENT", "SALES_ENRICHED_AGENT"),
     "bon": ("FINANCE_BON_AGENT", "SALES_BON_AGENT"),
 }
@@ -254,14 +254,14 @@ def print_scorecard(sc):
     print("\nACCURACY BY VALUE PILLAR (% correct)       B enriched  C +BON  BON uplift (C-B)")
     for p, a in sorted(pillars.items()):
         print(f"  {p:<28} {a.get('B',0):>10}% {a.get('C',0):>6}%   {a.get('C',0)-a.get('B',0):+d} pts")
-    print("\nSTABILITY (V6)              same answer every run   always right")
+    print("\nSTABILITY              same answer every run   always right")
     for r in sc["stability"]:
         print(f"  arm {r['ARM']}  {int(r['STABLE_PCT']):>28}% {int(r['ALWAYS_RIGHT_PCT']):>14}%")
-    print("\nCOST & TRACEABILITY (V7, V8)   median s   avg tools   names term+SV metric   fell for trap   hedged")
+    print("\nCOST & TRACEABILITY   median s   avg tools   names term+SV metric   fell for trap   hedged")
     for r in sc["cost_trace"]:
         print(f"  arm {r['ARM']}  {r['P50_S']:>18} {r['AVG_TOOLS']:>11} {int(r['TRACE_PCT']):>21}% "
               f"{int(r['TRAP_PCT']):>14}% {int(r['HEDGE_PCT'] or 0):>7}%")
-    print("\nCONSISTENCY ACROSS TEAMS (V4)  Finance agent vs Sales agent, same question")
+    print("\nCONSISTENCY ACROSS TEAMS  Finance agent vs Sales agent, same question")
     for r in sc["consistency"]:
         print(f"  {r['ARM']:<7} {r['QID']}  agree {int(r['AGREE_PCT'])}%  both right {int(r['BOTH_RIGHT_PCT'])}%")
 

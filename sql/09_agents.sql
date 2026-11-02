@@ -22,7 +22,7 @@
 --   Arm A  BARE_AGENT        3 BARE SVs
 --   Arm B  ENRICHED_AGENT    3 ENRICHED SVs
 --   Arm C  BON_AGENT         3 ENRICHED SVs + Business Ontology      (BON uplift = C - B)
---   Consistency pairs (V4: do two teams get the same answer?)
+--   Consistency pairs (do two teams get the same answer?)
 --          FINANCE_ENRICHED_AGENT / FINANCE_BON_AGENT   Finance + Procurement ENRICHED SVs
 --          SALES_ENRICHED_AGENT   / SALES_BON_AGENT     Sales + Procurement ENRICHED SVs
 --   Finance sees active_supplier_count (14); Sales only sees vendor_record_count (15).
