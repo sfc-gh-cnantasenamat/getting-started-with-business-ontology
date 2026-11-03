@@ -96,8 +96,8 @@ Ground truth, including the defensible-but-wrong trap answer for each question, 
 ## Prerequisites
 
 - A Snowflake account with Business Ontology enabled (Private Preview) and search indexing in your region.
-- A role that can create databases, semantic views and agents, and has ontology privileges. The demo used ACCOUNTADMIN.
-- Python 3.10+ and Node.js 18+ for the harness and web app.
+- One role, used as your primary role, that can create a database, warehouse, semantic views and agents, and has `CREATE ONTOLOGY DOMAIN` on the account (`ACCOUNTADMIN` has it by default). The role that creates the domains owns them, so it can also approve, link and search their nodes. The demo used ACCOUNTADMIN.
+- Python 3.10+ for the benchmark harness and the Streamlit app.
 - Optional: Cortex Code. The `$business-ontology` skill is bundled, so no install is needed.
 
 ## Build and run
@@ -116,14 +116,13 @@ sql/06_enriched_svs.sql       # PROCUREMENT / FINANCE / SALES _ENRICHED_SV
 sql/07_ontology.sql           # 3 domains, 40 nodes, 51 relationships (approve the drafts)
 sql/08_representations.sql    # 43 representations
 sql/09_agents.sql             # 7 agents: BARE_AGENT, ENRICHED_AGENT, BON_AGENT, Finance/Sales team pairs
-sql/10_live_scenarios.sql     # optional change-management scenarios
 ```
 
 `03_sap_schema.sql` stops with an error if the `RAW` tables are missing.
 
 In `07_ontology.sql`, approve the 39 drafts before running the `Relationships` section, then draft, approve and link *Tier A Supplier* in the last section. The approve calls are commented out because they need your term IDs; within one worksheet session you can use `SELECT SYSTEM$APPROVE_ALL_GLOSSARY_TERMS('[]', 'ACTIVE', '{"sessionId":"CURRENT_SESSION"}');` instead.
 
-> **Using a different database?** Every script uses `BUSINESS_ONTOLOGY`. To use your own name, replace it in all SQL files before running them, then set `SNOWFLAKE_DATABASE` (and `SNOWFLAKE_SCHEMA` if you rename `SAP`) for the benchmark and web app:
+> **Using a different database?** Every script uses `BUSINESS_ONTOLOGY`. To use your own name, replace it in all SQL files before running them, then set `SNOWFLAKE_DATABASE` (and `SNOWFLAKE_SCHEMA` if you rename `SAP`) for the benchmark and the Streamlit app:
 >
 > ```bash
 > grep -rl BUSINESS_ONTOLOGY sql | xargs sed -i.bak 's/BUSINESS_ONTOLOGY/MY_DB/g'
@@ -146,52 +145,46 @@ SNOWFLAKE_CONNECTION_NAME=<conn> python -u benchmark/run_benchmark.py --arms B,C
 SNOWFLAKE_CONNECTION_NAME=<conn> python -u benchmark/run_benchmark.py --resume <RUN_ID>
 ```
 
+If the connection's default role or warehouse can't run the agents, set `SNOWFLAKE_ROLE` and `SNOWFLAKE_WAREHOUSE` for the run, for example `SNOWFLAKE_ROLE=ACCOUNTADMIN SNOWFLAKE_WAREHOUSE=BUSINESS_ONTOLOGY_WH`. The index check searches through the same connection.
+
 The harness refuses to run until the index serves the new nodes, including Tier A, unless you pass `--force`. Calls retry on transient connection errors. Results go to `SAP.BENCHMARK_RESULTS` and `benchmark/scorecard_<run_id>.json`.
 
-### 3. Web app
+### 3. Streamlit app
+
+The app in `streamlit/` runs locally or in Snowflake. To run it locally with a connection from `~/.snowflake/connections.toml`:
 
 ```bash
-cd web
+cd streamlit
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env.local        # fill in your own connection details; never commit .env.local
-export SNOWFLAKE_CONNECTION_NAME=<conn>
-python api_server.py              # Flask API on http://localhost:5001
-
-npm install && npm run dev        # Next.js on http://localhost:3000
+SNOWFLAKE_CONNECTION_NAME=<conn> streamlit run streamlit_app.py    # http://localhost:8501
 ```
+
+Without `SNOWFLAKE_CONNECTION_NAME`, the app uses `[connections.snowflake]` from `.streamlit/secrets.toml`; copy `.streamlit/secrets.toml.example` to start one, and never commit the copy. In Snowflake, the app uses its own session, so no secrets are needed.
 
 ## Demo walkthrough
 
-- **Context tab:**
+- **Context page:**
   - **What semantic views can't settle on their own.** Three tables, each showing the risk with semantic views alone next to what BON adds:
     - which metric is canonical;
     - cross-domain metrics;
     - governed meaning.
-  - **The rest of the tab:**
+  - **The rest of the page:**
     - the semantic view diagram;
     - the ontology graph (40 nodes / 51 relationships / 43 representations);
     - the source tables.
-- **Comparison tab:** ask a question and see the Enriched agent and the BON agent side by side. The 9 curated questions are 3 per tier, and for tiers 2 to 4 only questions where BON measurably beat the semantic views:
+- **Comparison page:** ask a question and see the Enriched agent and the BON agent side by side. The 9 curated questions are 3 per tier, and for tiers 2 to 4 only questions where BON measurably beat the semantic views:
   - Tier 1: Q01, Q03, Q04
   - Tier 2: Q06, Q07, Q19
   - Tier 3: Q12
   - Tier 4: Q17, Q18
-- **Analysis tab:** tier scores across all 20 questions from the latest run, plus a per-question table for the curated questions.
+- **Analysis page:** tier scores across all 20 questions from the latest run, plus a per-question table for the curated questions.
 
 ```
-Next.js (:3000) ──▶ Flask API (:5001) ──▶ DATA_AGENT_RUN()
-                                           ├─ ENRICHED_AGENT ─ 3 enriched SVs
-                                           └─ BON_AGENT ────── 3 enriched SVs + business_ontology (snowscope_search)
+Streamlit app ──▶ DATA_AGENT_RUN()
+                  ├─ ENRICHED_AGENT ─ 3 enriched SVs
+                  └─ BON_AGENT ────── 3 enriched SVs + business_ontology (snowscope_search)
 ```
-
-## Live scenarios (change management)
-
-`sql/10_live_scenarios.sql` covers what a one-off benchmark can't:
-
-- **S1 Change once:** a steward edits the Supplier Count definition. Every BON agent follows it, with no change to any semantic view or prompt.
-- **S2 Drafts are never served:** an unapproved definition stays invisible to agents until it is approved.
-- **S3 Semantic view rebuild:** renaming a semantic view metric breaks one IMPLEMENTS representation. The break is detectable and fixable in one place.
 
 ## Known limits (Private Preview)
 

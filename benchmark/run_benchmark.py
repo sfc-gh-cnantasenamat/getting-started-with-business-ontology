@@ -63,14 +63,18 @@ RETIRED_DOMAINS = ("SAP Purchasing.", "SAP Finance.", "SAP Sales.")
 
 
 def connect():
-    return snowflake.connector.connect(connection_name=os.environ.get("SNOWFLAKE_CONNECTION_NAME", "default"))
+    # SNOWFLAKE_ROLE / SNOWFLAKE_WAREHOUSE override the connection's defaults, e.g. when its default role is read-only.
+    overrides = {k: os.environ[e] for k, e in (("role", "SNOWFLAKE_ROLE"), ("warehouse", "SNOWFLAKE_WAREHOUSE")) if os.environ.get(e)}
+    return snowflake.connector.connect(connection_name=os.environ.get("SNOWFLAKE_CONNECTION_NAME", "default"), **overrides)
 
 
 def check_index():
     """Return (ready, report). Ready when new nodes are found and retired SAP * domain nodes are gone."""
     ready, lines = True, []
+    # Search the same connection the benchmark runs on.
+    conn_args = ["-c", os.environ["SNOWFLAKE_CONNECTION_NAME"]] if os.environ.get("SNOWFLAKE_CONNECTION_NAME") else []
     for query, expected in INDEX_PROBES:
-        out = subprocess.run(["cortex", "search", "object", query, "--types=business-ontology"],
+        out = subprocess.run(["cortex", "search", "object", query, "--types=business-ontology", *conn_args],
                              capture_output=True, text=True, timeout=120).stdout
         hits = re.findall(r"\d+\. ([^\n(]+) \(", out)
         found = expected in [h.strip() for h in hits]
